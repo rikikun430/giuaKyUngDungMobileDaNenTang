@@ -1,5 +1,12 @@
 import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Modal } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Modal,
+  AntDesign
+} from "react-native";
 import Colors from "../Colors";
 import ToDoModal from "./ToDoModal";
 
@@ -37,7 +44,18 @@ export default class toDoList extends React.Component {
         <TouchableOpacity onPress={() => this.toogleListModal()}>
           <View style={[styles.listContainer, { backgroundColor: list.color }]}>
             <View>
-              <TouchableOpacity></TouchableOpacity>
+              <TouchableOpacity>
+                <Text
+                  style={{
+                    paddingVertical: 10,
+                    textAlignVertical: "center",
+                    fontSize: 20,
+                    paddingRight: 20
+                  }}
+                >
+                  X
+                </Text>
+              </TouchableOpacity>
             </View>
             <View style={styles.elementContainer}>
               <Text style={styles.listTitle} numberOfLines={1}>
@@ -63,13 +81,13 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     width: "90%",
-    height: 180,
-    paddingTop: 45,
+    height: 150,
+    marginBottom: 60,
     borderTopStartRadius: 15,
     borderTopEndRadius: 15,
     borderRadius: 6,
     margin: 20,
-    alignItems: "center"
+    alignItems: "flex-end"
   },
   listTitle: {
     fontSize: 28,
