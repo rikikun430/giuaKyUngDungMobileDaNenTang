@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import {
   SafeAreaView,
@@ -15,10 +15,13 @@ import Timetable from "react-native-calendar-timetable";
 
 import ToDoItem from "./ToDoItem";
 import AddTodoItem from "./AddTodoItem";
-
+import DAO from "../Database/DAO";
+import { db } from "../Database/Connection";
 //import DAO from "../Database/DAO";
 
 export default ToDoModal = function (props) {
+  const TaskDetail = props.TaskItem;
+
   const [isVisible, setVisible] = useState(false);
   const toggleVisibility = () => setVisible(!isVisible);
 
@@ -27,15 +30,37 @@ export default ToDoModal = function (props) {
   const [till] = React.useState(moment().add(3, "days").toISOString());
   const range = { from, till };
 
-  const [items, setItems] = React.useState([
-    {
-      title: "Go to cafe",
-      Color: "lightblue",
-      Content: "Meet my friends",
-      startDate: moment().subtract(1, "hour").toDate(),
-      endDate: moment().add(1, "hour").toDate()
-    }
-  ]);
+  const [items, setItems] = React.useState(TaskDetail);
+
+  const CreateTodo = (title, color, StartTime, EndTime) => {
+    const options = { hour: "2-digit", minute: "2-digit", hour12: false };
+    const startTime = StartTime.toLocaleTimeString(undefined, options); // Convert Date object to 24-hour string time
+    const endTime = EndTime.toLocaleTimeString(undefined, options);
+    console.log(startTime, "start");
+
+    DAO(db)
+      .addNewToDo(title, startTime, endTime, color, 0, props.TaskID)
+      .then((insertedID) => {
+        console.log("Inserted ToDo:", insertedID);
+        setItems((currentItem) => [
+          ...currentItem,
+          {
+            id: insertedID,
+            title: title,
+            taskID: props.TaskID,
+            Color: color || "lightblue",
+            startDate: StartTime,
+            endDate: EndTime,
+            complete: 0
+          }
+        ]);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  console.log("initial Data", items);
 
   // toggleTodoCompleted = (index) => {
   //   let list = props.list;
@@ -52,24 +77,8 @@ export default ToDoModal = function (props) {
   //   this.setState({ newTodo: "" });
   // };
 
-  const TaskDetail = props?.TaskItem;
-
-  const CreateTodo = (title, content, color, StartTime, EndTime) => {
-    setItems((currentItem) => [
-      ...currentItem,
-      {
-        title: title,
-        Content: content,
-        Color: color,
-        startDate: StartTime,
-        endDate: EndTime
-      }
-    ]);
-  };
-  const taskCount = TaskDetail.todos.length;
-  const completedCount = TaskDetail.todos.filter(
-    (todo) => todo.completed
-  ).length;
+  const taskCount = TaskDetail.length;
+  const completedCount = TaskDetail.filter((todo) => todo.completed).length;
   return (
     <>
       <SafeAreaView style={styles.container}>
@@ -94,7 +103,7 @@ export default ToDoModal = function (props) {
               // these two are required
               items={items}
               renderItem={(props) => {
-                console.log(props);
+                console.log(items);
                 return <ToDoItem {...props} />;
               }}
               // provide only one of these
@@ -157,8 +166,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: 800,
-    Colors: Colors.black
+    fontWeight: 800
   },
   taskCount: {
     marginTop: 4,

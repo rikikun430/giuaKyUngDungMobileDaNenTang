@@ -7,19 +7,27 @@ export default [
     todos: [
       {
         title: "Book flight",
-        completed: false
+        StartTime: "15:00",
+        EndTime: "17:30",
+        completed: true
       },
       {
         title: "Passport check",
+        StartTime: "18:30",
+        EndTime: "20:30",
         completed: true
       },
       {
         title: "Reverse hotel room",
+        StartTime: "19:30",
+        EndTime: "22:30",
         completed: true
       },
       {
         title: "Pack luggage",
-        completed: false
+        StartTime: "21:30",
+        EndTime: "23:30",
+        completed: true
       }
     ]
   },
@@ -31,23 +39,27 @@ export default [
     todos: [
       {
         title: "Buy Milk",
-        time: "18:30",
+        StartTime: "7:30",
+        EndTime: "9:30",
         completed: true
       },
       {
         title: "Clean house",
-        time: "15:30",
+        StartTime: "18:30",
+        EndTime: "20:30",
         completed: true
       },
       {
         title: "Jogging",
-        time: "12:30",
+        StartTime: "18:30",
+        EndTime: "20:30",
         completed: true
       },
       {
         title: "Playing",
-        time: "9:30",
-        completed: false
+        StartTime: "18:30",
+        EndTime: "20:30",
+        completed: true
       }
     ]
   },
@@ -59,19 +71,27 @@ export default [
     todos: [
       {
         title: "Coffee shop",
-        completed: false
+        StartTime: "18:30",
+        EndTime: "20:30",
+        completed: true
       },
       {
         title: "Check list",
+        StartTime: "18:30",
+        EndTime: "20:30",
         completed: true
       },
       {
         title: "Party night",
-        completed: false
+        StartTime: "18:30",
+        EndTime: "20:30",
+        completed: true
       },
       {
         title: "Sleeping",
-        completed: false
+        StartTime: "18:30",
+        EndTime: "20:30",
+        completed: true
       }
     ]
   }

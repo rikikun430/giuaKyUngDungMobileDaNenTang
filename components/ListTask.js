@@ -16,11 +16,17 @@ import React from "react";
 export default class App extends React.Component {
   state = {
     addToDoVisble: false,
-    lists: tempData
+    lists: this.props.data
   };
 
-  renderList = (list) => {
-    return <ToDoList list={list} updateList={this.updateList} />;
+  componentDidUpdate(prevProps) {
+    if (prevProps.data !== this.props.data) {
+      this.setState({ lists: this.props.data });
+    }
+  }
+
+  renderList = (item) => {
+    return <ToDoList RenderItems={item} updateList={this.updateList} />;
   };
 
   addList = (list) => {
@@ -41,6 +47,7 @@ export default class App extends React.Component {
   };
 
   render() {
+    console.log("InList task", this.state.lists);
     return (
       <View style={styles.container}>
         <Text style={styles.functionTitle}>Today task</Text>
@@ -56,13 +63,13 @@ export default class App extends React.Component {
           <FlatList
             style={styles.showListTask}
             data={this.state.lists}
-            keyExtractor={(item) => item.name}
             horizontal={false}
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => {
               const selectedTask = this.props.filled;
 
               if (selectedTask.toDateString() == item.createDate) {
+                console.log("render", item);
                 return this.renderList(item);
               }
             }}

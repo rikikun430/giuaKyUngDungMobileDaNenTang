@@ -18,63 +18,42 @@ import ListTask from "./components/ListTask";
 import ToDoModal from "./components/ToDoModal";
 import AddListModal from "./components/AddListToMoDal";
 import Font from "./fonts";
-
-import SQLite from "react-native-sqlite-storage";
-
-// const db = SQLite.openDatabase(
-//   { name: "myDatabase.db", location: "default" },
-//   () => console.log("Database opened successfully."),
-//   (error) => console.log("Error opening database: ", error)
-// );
-
-// const CreateTable = () => {
-//   db.transaction((tx) => {
-//     tx.executeSql(
-//       `CREATE TABLE IF NOT EXISTS myTable (
-//         id INTEGER PRIMARY KEY NOT NULL,
-//         name TEXT,
-//         color TEXT,
-//         createDate TEXT,
-//         todos TEXT
-//       );`,
-//       [],
-//       () => {
-//         console.log("Create table Success");
-//       },
-//       (error) => {
-//         console.log("Create table failed", error);
-//       }
-//     );
-//   });
-// };
+import InitialData from "./Database/InitialData";
 
 const { width } = Dimensions.get("screen");
 
-const List = [];
+import { db, initializeDatabase } from "./Database/Connection";
+import DAO from "./Database/DAO";
 
+const StartData = [];
 export default function App() {
-  // useEffect(() => {
-  //   // Run your function here
-  //   CreateTable();
-  //   startProgram();
-  // }, []);
+  const [List, setList] = useState(StartData);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        // Call the initializeDatabase function to initialize the database
+        await initializeDatabase();
 
-  // const startProgram = () => {
-  //   db.transaction((tx) => {
-  //     tx.executeSql(
-  //       `SELECT name FROM sqlite_master WHERE type='table' AND name='myTable';`,
-  //       [],
-  //       (tx, results) => {
-  //         if (results.rows.length === 0) {
-  //           CreateTable();
-  //         }
-  //       },
-  //       (error) => {
-  //         console.log("Error checking table existence", error);
-  //       }
-  //     );
-  //   });
-  // };
+        console.log("Database initialized successfully");
+        await InitialData(db);
+        DAO(db)
+          .getAllTasks()
+          .then((Data) => {
+            console.log("Retrieved tasks:", Data);
+
+            Data.forEach((element) => {
+              StartData.push(element);
+            });
+          })
+          .catch((error) => {
+            console.log("Error retrieving tasks:", error);
+          });
+      } catch (error) {
+        console.log("Error initializing database: ", error);
+      }
+    }
+    fetchData();
+  }, []);
 
   const [value, setValue] = useState(new Date());
   const [week, setWeek] = useState(0);
@@ -98,8 +77,53 @@ export default function App() {
   }, [week]);
 
   const CreateTask = (name, color, Today) => {
-    console.log(name, color, Today);
+    console.log("InsertDT", name, color, Today);
+
+    console.log(List, "checking");
+    DAO(db)
+      .addNewtask(name, color, Today, 0)
+      .then((id) => {
+        console.log("Add task successfully", id);
+        setList((current) => {
+          if (!Array.isArray(current)) {
+            current = []; // If current is not an array, initialize it as an empty array
+          }
+
+          return [
+            ...current,
+            {
+              color: color,
+              id: id,
+              createDate: Today,
+              name: name,
+              total: 0
+            }
+          ];
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
+
+  function PrintData() {
+    DAO(db)
+      .getAllTasks()
+      .then((Data) => {
+        //console.log("Retrieved tasks:", Data);
+        const Dt = [];
+        Data.forEach((element) => {
+          Dt.push(element);
+        });
+
+        console.log(Dt);
+      })
+      .catch((error) => {
+        console.log("Error retrieving tasks:", error);
+      });
+  }
+
+  function DeleteTask(TaskID) {}
 
   const [AddTodoVisible, setAddTodoVisible] = useState(false);
 
@@ -200,7 +224,7 @@ export default function App() {
         </View>
         {/** Content */}
         <View style={style.content}>
-          <ListTask filled={value}></ListTask>
+          <ListTask data={List} filled={value}></ListTask>
 
           <Modal
             animationType="slide"
@@ -209,6 +233,7 @@ export default function App() {
           >
             <AddListModal
               createTask={CreateTask}
+              currentDate={value.toDateString()}
               closeModal={() => AddTodoModal()}
             />
           </Modal>
@@ -219,6 +244,8 @@ export default function App() {
         onPressItem={(name) => {
           if (name == "bt_addNote") {
             AddTodoModal();
+          } else if (name == "bt_PrintNote") {
+            PrintData();
           }
         }}
       ></FloatingAction>
@@ -295,5 +322,11 @@ const actions = [
     icon: require("./assets/addNote.png"),
     name: "bt_addNote",
     position: 2
+  },
+  {
+    text: "Print task",
+    icon: require("./assets/addNote.png"),
+    name: "bt_PrintNote",
+    position: 3
   }
 ];

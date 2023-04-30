@@ -40,17 +40,17 @@ export default function AddTodoItem(props) {
       return;
     }
     setStartTime(selectionTime); //setStartTime(selectionTime);
-    console.log(selectionTime);
+    //console.log(selectionTime);
   };
 
   const onCreate = () => {
-    if (title == "" || content == "") {
+    if (title == "") {
       setSnackIsVisible(true);
       console.log("Here");
     } else {
       setSnackIsVisible(false);
-      props.onCreate(title, content, color, StartTime, EndTime);
-      console.log(title, content, color, StartTime, EndTime);
+      props.onCreate(title, color, StartTime, EndTime);
+      //console.log(title, content, color, StartTime, EndTime);
       props.onClose();
     }
   };
@@ -62,7 +62,7 @@ export default function AddTodoItem(props) {
       return;
     }
     setEndTime(selectionTime); //setStartTime(selectionTime);
-    console.log(selectionTime);
+    //console.log(selectionTime);
   };
   const backgroundColor = [
     "#24A6D9",
@@ -123,16 +123,6 @@ export default function AddTodoItem(props) {
             placeholder="Title"
             placeholderTextColor={Colors.gray}
             onChangeText={(text) => setTitle(text)}
-          />
-
-          <TextInput
-            style={[styles.input, styles.content]}
-            placeholder="Content"
-            placeholderTextColor={Colors.gray}
-            multiline={true}
-            editable={keyboardDisplay}
-            textAlign="left"
-            onChangeText={(text) => setContent(text)}
           />
 
           <View

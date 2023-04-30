@@ -36,7 +36,7 @@ export default class AddListModal extends React.Component {
 
     this.setState({ name: "" });
     this.props.closeModal();
-    this.props.createTask(name, color, Today.toDateString());
+    this.props.createTask(name, color, this.props.currentDate);
   };
   RenderColor() {
     return this.backgroundColor.map((color) => {

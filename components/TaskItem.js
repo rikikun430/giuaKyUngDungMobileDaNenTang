@@ -11,15 +11,61 @@ import Colors from "../Colors";
 import ToDoModal from "./ToDoModal";
 
 import * as Font from "expo-font";
+import DAO from "../Database/DAO";
+import { db } from "../Database/Connection";
 
 export default class toDoList extends React.Component {
   state = {
-    showListVisible: false
+    showListVisible: false,
+    taksInformations: this.props.RenderItems,
+    listTodos: [],
+    showTask: null
   };
 
-  toogleListModal() {
+  convertTimeToDate(customTime) {
+    const today = new Date();
+    const datePart = today.toISOString().split("T")[0]; // Get the date part from today's ISO string
+    const customISOString = `${datePart}T${customTime}:00.000Z`;
+    const date = new Date(customISOString);
+
+    return date;
+  }
+
+  ShowListModal() {
+    DAO(db)
+      .getTodoByTasksID(this.state.taksInformations.id)
+      .then((data) => {
+        data.forEach((element) => {
+          element.StartTime = this.convertTimeToDate(element.StartTime); // Convert 24-hour string time to Date object
+          element.EndTime = this.convertTimeToDate(element.EndTime);
+          this.state.listTodos.push(element);
+          //console.log(element, "get Task");
+        });
+        this.state.showTask = this.taskitem();
+        //console.log(this.state.listTodos);
+        this.setState({ showListVisible: !this.state.showListVisible });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  CloseListModal() {
+    this.state.listTodos = [];
+    this.state.showTask = null;
     this.setState({ showListVisible: !this.state.showListVisible });
   }
+
+  taskitem() {
+    return (
+      <ToDoModal
+        TaskItem={this.state.listTodos}
+        TaskID={this.state.taksInformations.id}
+        closeModal={() => this.CloseListModal()}
+      />
+    );
+  }
+
   async loadFonts() {
     await Font.loadAsync({
       Rubik: require("../assets/fonts/static/Rubik-Light.ttf")
@@ -27,21 +73,18 @@ export default class toDoList extends React.Component {
   }
 
   render() {
-    const list = this.props.list;
-    console.log(list);
+    const list = this.state.taksInformations;
+    //console.log(list, "inviews");
     return (
       <View style={styles.container}>
         <Modal
           animationType="slide"
           visible={this.state.showListVisible}
-          onRequestClose={() => this.toogleListModal()}
+          onRequestClose={() => this.CloseListModal()}
         >
-          <ToDoModal
-            TaskItem={list}
-            closeModal={() => this.toogleListModal()}
-          />
+          {this.state.showTask}
         </Modal>
-        <TouchableOpacity onPress={() => this.toogleListModal()}>
+        <TouchableOpacity onPress={() => this.ShowListModal()}>
           <View style={[styles.listContainer, { backgroundColor: list.color }]}>
             <View>
               <TouchableOpacity>
@@ -64,7 +107,7 @@ export default class toDoList extends React.Component {
               <View style={{ marginRight: 25 }}>
                 <View style={{ alignItems: "center" }}>
                   <Text style={styles.subTitle}>Total Task</Text>
-                  <Text style={styles.count}>{list.todos.length}</Text>
+                  <Text style={styles.count}>{list.total}</Text>
                 </View>
               </View>
             </View>

@@ -8,6 +8,7 @@
 import { View, Text } from "react-native";
 
 export default function ToDoItem({ style, item, dayIndex, daysTotal }) {
+  console.log("renderItem", item);
   return (
     <View
       style={{
@@ -20,7 +21,6 @@ export default function ToDoItem({ style, item, dayIndex, daysTotal }) {
       }}
     >
       <Text style={{ color: "white", fontWeight: "bold" }}>{item?.title}</Text>
-      <Text style={{ color: "white" }}>{item?.Content}</Text>
     </View>
   );
 }
